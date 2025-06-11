@@ -35,26 +35,26 @@ The following will start Jump and serve the page at http://localhost:8123 with a
 `OWMAPIKEY` and `LATLONG` values below are just for example - refer to the [environment variables](https://github.com/daledavies/jump?tab=readme-ov-file#environment-variables).
 
 ```yaml
-version: '3'
+version: "3"
 services:
-    web:
-        image: daledavies/jump
-        ports:
-            - 8123:8080
-        volumes:
-            - ./backgrounds:/backgrounds
-            - ./favicon:/favicon
-            - ./search:/search
-            - ./sites:/sites
-        environment:
-            SITENAME: 'Custom site name'
-            OWMAPIKEY: '0a1b2c3d4e5f6a7b8c9d0a1b'
-            LATLONG: '51.509865,-0.118092'
+  web:
+    image: daledavies/jump
+    ports:
+      - 8123:8080
+    volumes:
+      - ./backgrounds:/backgrounds
+      - ./favicon:/favicon
+      - ./search:/search
+      - ./sites:/sites
+    environment:
+      SITENAME: "Custom site name"
+      OWMAPIKEY: "0a1b2c3d4e5f6a7b8c9d0a1b"
+      LATLONG: "51.509865,-0.118092"
 ```
 
 #### Volume Mapping
 
-You can map the "backgrounds",  "favicon", "search" and "sites" directories to local directories as shown in the Docker Compose example above. Your local directories will be populated with Jump's default files when the container is next started unless the local directories already contain files, in which case the local files will be used by Jump instead.
+You can map the "backgrounds", "favicon", "search" and "sites" directories to local directories as shown in the Docker Compose example above. Your local directories will be populated with Jump's default files when the container is next started unless the local directories already contain files, in which case the local files will be used by Jump instead.
 
 #### Docker
 
@@ -135,9 +135,9 @@ You can use the following optional environment variables to configure/customise 
 - `NOINDEX` - Include a robots noindex meta tag in site header (default: 'true').
 - `WWWURL` - Useful if Jump is hosted in a sub-directory (e.g. "/startpage").
 - `DISABLEIPV6` - Disable IPV6 if required (default: 'false').
-- `DOCKERSOCKET` -  Mounted docker socket location, for Docker integration without a proxy (e.g "/var/run/docker.sock").
+- `DOCKERSOCKET` - Mounted docker socket location, for Docker integration without a proxy (e.g "/var/run/docker.sock").
 - `DOCKERPROXYURL` - Docker proxy URL, for Docker integration with a proxy (e.g. "dockerproxy:2375").
-- `DOCKERONLYSITES`  - Set to true if you want to only use docker integration and not define a `sites.json` (default: 'false').
+- `DOCKERONLYSITES` - Set to true if you want to only use docker integration and not define a `sites.json` (default: 'false').
 - `LANGUAGE` - Set to your chosen [language code](#language) (default: 'en').
 - `CACHEBYPASS` - Bypass all caches, useful for testing changes (default: 'false').
 - `DEBUG` - Enable debug mode (default: 'false').
@@ -148,11 +148,11 @@ You can use the following optional environment variables to configure/customise 
 
 You can configure Jump to get local time and weather updates by adding an Open Weather Map API key to `config.php` or passing the `OWMAPIKEY ` environment variable to the Docker container (as described above).
 
-You will also need to provide a default `LATLONG` string (e.g. "51.509865,-0.118092"), Jump will use this  until you press the location button and allow permission to get your location from the web browser.
+You will also need to provide a default `LATLONG` string (e.g. "51.509865,-0.118092"), Jump will use this until you press the location button and allow permission to get your location from the web browser.
 
 ### Sites
 
-The `sites.json` file is where you can define default configuration for sites and add a list of sites manually to the startpage, this is great for adding sites that are hosted anywhere on the web. 
+The `sites.json` file is where you can define default configuration for sites and add a list of sites manually to the startpage, this is great for adding sites that are hosted anywhere on the web.
 
 Jump can also integrate with Docker to automatically list any sites you have running on the same Docker host.
 
@@ -217,8 +217,8 @@ Edit the `/sites/sites.json` file to include your own sites on the startpage...
 }
 ```
 
-* `name` and `url` are mandatory.
-* `description`, `tags`, `nofollow`, `newtab`, `icon` and `status` are optional.
+- `name` and `url` are mandatory.
+- `description`, `tags`, `nofollow`, `newtab`, `icon` and `status` are optional.
 
 ##### Tags
 
@@ -264,45 +264,45 @@ It is highly recommended to use a [docker socket proxy](https://github.com/Tecna
 ```yaml
 # Configure docker socket proxy container
 dockerproxy:
-    image: tecnativa/docker-socket-proxy:latest
-    environment:
-        - CONTAINERS=1 # Allow access to view containers
-        - POST=0 # Make the connection read only
-    volumes:
-        - /var/run/docker.sock:/var/run/docker.sock:ro # Read only mount for local socket
+  image: tecnativa/docker-socket-proxy:latest
+  environment:
+    - CONTAINERS=1 # Allow access to view containers
+    - POST=0 # Make the connection read only
+  volumes:
+    - /var/run/docker.sock:/var/run/docker.sock:ro # Read only mount for local socket
 
 # Configure Jump to use docker socket proxy
 web:
-    image: daledavies/jump
-    ports:
-        - 8123:8080
-    volumes:
-        - ./backgrounds:/backgrounds
-        - ./favicon:/favicon
-        - ./search:/search
-        - ./sites:/sites
-    environment:
-        SITENAME: 'Custom site name'
-        DOCKERPROXYURL: 'dockerproxy:2375' # Matches proxy hostname and ports from above
-    depends_on:
-        - dockerproxy # Ensure dockerproxy is available before starting jump
+  image: daledavies/jump
+  ports:
+    - 8123:8080
+  volumes:
+    - ./backgrounds:/backgrounds
+    - ./favicon:/favicon
+    - ./search:/search
+    - ./sites:/sites
+  environment:
+    SITENAME: "Custom site name"
+    DOCKERPROXYURL: "dockerproxy:2375" # Matches proxy hostname and ports from above
+  depends_on:
+    - dockerproxy # Ensure dockerproxy is available before starting jump
 ```
 
 ##### Configuring docker sites for Jump
 
-Then each for each docker service you with to list on your startpage, configure labels as follows. Each label below matches the options found in the  manual configuration section above...
+Then each for each docker service you with to list on your startpage, configure labels as follows. Each label below matches the options found in the manual configuration section above...
 
 ```yaml
 somesite:
-    image: dockerimage
-    labels:
-        jump.name: 'Test Site'
-        jump.url: 'https://test.site'
-        jump.description: 'This is a site for testing'
-        jump.tags: 'home, stuff, things'
-        jump.status.allowed_status_codes: '418, 500'
-        jump.status.request_method: 'GET'
-        jump.status.verify_cert: false
+  image: dockerimage
+  labels:
+    jump.name: "Test Site"
+    jump.url: "https://test.site"
+    jump.description: "This is a site for testing"
+    jump.tags: "home, stuff, things"
+    jump.status.allowed_status_codes: "418, 500"
+    jump.status.request_method: "GET"
+    jump.status.verify_cert: false
 ```
 
 ### Search
@@ -311,18 +311,18 @@ Edit the `/search/searchengines.json` file to customise the list of search engin
 
 ```json
 [
-    {
-        "name": "Google",
-        "url": "https://www.google.co.uk/search?q="
-    },
-    {
-        "name": "DuckDuckGo",
-        "url": "https://duckduckgo.com/?q="
-    },
-    {
-        "name": "Bing",
-        "url": "https://www.bing.com/search?q="
-    }
+  {
+    "name": "Google",
+    "url": "https://www.google.co.uk/search?q="
+  },
+  {
+    "name": "DuckDuckGo",
+    "url": "https://duckduckgo.com/?q="
+  },
+  {
+    "name": "Bing",
+    "url": "https://www.bing.com/search?q="
+  }
 ]
 ```
 
@@ -348,6 +348,7 @@ Jump has been translated into the following languages so far, to use one of thes
 - `it` - Italian
 - `nl` - Dutch
 - `pt` - Portuguese
+- `pt-br` - Brazilian Portuguese
 - `ru` - Russian
 - `ua` - Ukrainian
 
@@ -355,7 +356,7 @@ More translations are always welcome! If you'd like to contribute please see the
 
 ### Debugging
 
-Occasionally things don't work out as expected! If you get an error and want to find out a bit more information you can use the built in debug option.  To enable this set `debug` to `true` in `config.php` or via the `DEBUG` environment variable.
+Occasionally things don't work out as expected! If you get an error and want to find out a bit more information you can use the built in debug option. To enable this set `debug` to `true` in `config.php` or via the `DEBUG` environment variable.
 
 When resolving problems it can also help to use the `cachebypass` option, this will disable all caching in Jump.
 
